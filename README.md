@@ -1,6 +1,5 @@
 # Sudoku
-This is a sudoku game you can play, and can let the computer solve the board for you
-I made this nice little project after being inspired by a question from a test, and a youtube video
+This is a sudoku game you can play, or let the computer solve the board for you at any point.
 
 ## Backtracking
 Generally the code for solving the sudoku works with backtracking
