@@ -3,14 +3,7 @@ from globe import *
 
 # ----- Game vars -----
 
-amount = 10
 # board = [[0 for j in range(amount)] for i in range(amount)]
-
-# ----- GUI vars -----
-
-window = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Sudoku")
-
 board = [
 	[7, 8, 0, 4, 0, 0, 1, 2, 0],
 	[6, 0, 0, 0, 7, 5, 0, 0, 9],
@@ -23,8 +16,14 @@ board = [
 	[0, 4, 9, 2, 0, 6, 0, 0, 7]
 ]
 
-rows = [{i: False} for i in range(amount) for k in range(amount)]
-cols = [{i: False} for i in range(amount) for r in range(amount)]
+rows = [{i: False} for i in range(AMOUNT) for k in range(AMOUNT)]
+cols = [{i: False} for i in range(AMOUNT) for r in range(AMOUNT)]
+
+# ----- GUI vars -----
+
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Sudoku")
+length = int(WIDTH / AMOUNT)
 
 # ----- Game methods -----
 
@@ -53,22 +52,52 @@ def erase(i, j):
 
 
 def win():
-	for i, j in range(amount), range(amount):
-		if board[i][j] == 0:
-			return False
+	for i, in range(AMOUNT):
+		for j in range(AMOUNT):
+			if board[i][j] == 0:
+				return False
 	return True
 
 
+def main():
+	redraw_screen()
+	draw_board()
+	run = True
+	while run:
+		for event in pygame.event.get():
+			if event.type == pygame.QUIT:
+				run = False
+				pygame.quit()
+
+			if event.type == pygame.MOUSEBUTTONDOWN:
+				if event.button == 1:
+					redraw_screen()
+					draw_board()
+					x, y = event.pos
+					if x < WIDTH and y < WIDTH:
+						pos = (int(int((x / WIDTH) * AMOUNT) * length), int(int((y / WIDTH) * AMOUNT) * length))
+						pygame.draw.rect(screen, (255, 0, 0), (pos[0], pos[1], length, length), 3)
+						pygame.display.update()
+
 # ----- GUI methods -----
 
-def redraw_screen(screen):
+
+def redraw_screen():
 	screen.fill(BACKGROUND_COLOR)
-	draw_board()
 	pygame.display.update()
 
 
-def draw_board(window):
-	length = WIDTH / amount
-	for i in range(amount + 1):
-		pygame.draw.line()
+def draw_board():
+	for i in range(AMOUNT + 1):
+		width = 1
+		if i % 3 == 0 and i != 0:
+			width = 3
+		pygame.draw.line(screen, MAIN_COLOR, (0, length * i), (WIDTH, length * i), width)
+		if i != AMOUNT:
+			pygame.draw.line(screen, MAIN_COLOR, (length * i, 0), (length * i, WIDTH), width)
+	pygame.display.update()
+
+
+if __name__ == "__main__":
+	main()
 
