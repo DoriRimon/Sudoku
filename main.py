@@ -1,4 +1,3 @@
-import pygame
 from globe import *
 
 # ----- Game vars -----
@@ -96,6 +95,22 @@ def win():
 	return number_of_full == AMOUNT
 
 
+def enter(event, x, y):
+	number = NUMBERS.index(event.key) + 1
+	# Game:
+	i, j = int((y / WIDTH) * AMOUNT), int((x / WIDTH) * AMOUNT)
+	num = None
+	if contains(i, j):
+		num = board[i][j]
+		erase(i, j)
+	flag = write(i, j, number)
+	if not flag and num is not None:  # We over wrote on a number with an invalid one
+		flag = True
+		number = num
+		write(i, j, number)
+	return flag, number
+
+
 def main():
 	global active_square
 	pygame.init()
@@ -124,29 +139,12 @@ def main():
 				if event.key in NUMBERS and active_square is not None:
 					x, y = int(active_square.x + (length / 2.4)), int(active_square.y + (length / 3.5))
 					if x < WIDTH and y < WIDTH:
-						number = NUMBERS.index(event.key) + 1
 						# Game:
-						i, j = int((y / WIDTH) * AMOUNT), int((x / WIDTH) * AMOUNT)
-						num = None
-						if contains(i, j):
-							num = board[i][j]
-							erase(i, j)
-						flag = write(i, j, number)
-						if not flag and num is not None: # We over wrote on a number with an invalid one
-							flag = True
-							number = num
-							write(i, j, number)
+						flag, number = enter(event, x, y)
 
 						# GUI:
 						if flag:
-							if active_square is not None:
-								pygame.draw.rect(screen, BACKGROUND_COLOR, active_square, 3)
-								screen.fill(BACKGROUND_COLOR, active_square)
-							draw_board()
-							pygame.draw.rect(screen, (255, 0, 0), active_square, 3)
-							word_surface = pygame.font.SysFont("microsoftjhengheimicrosoftjhengheiuilight", 20).render(str(number), 0, MAIN_COLOR)
-							screen.blit(word_surface, (x, y))
-							pygame.display.update()
+							draw_number(x, y, number)
 
 
 # ----- GUI methods -----
@@ -165,6 +163,18 @@ def draw_board():
 		pygame.draw.line(screen, MAIN_COLOR, (0, length * i), (WIDTH, length * i), width)
 		if i != AMOUNT:
 			pygame.draw.line(screen, MAIN_COLOR, (length * i, 0), (length * i, WIDTH), width)
+	pygame.display.update()
+
+
+def draw_number(x, y, number):
+	if active_square is not None:
+		pygame.draw.rect(screen, BACKGROUND_COLOR, active_square, 3)
+		screen.fill(BACKGROUND_COLOR, active_square)
+	draw_board()
+	pygame.draw.rect(screen, (255, 0, 0), active_square, 3)
+	word_surface = pygame.font.SysFont("microsoftjhengheimicrosoftjhengheiuilight", 20).render(str(number), 0,
+	                                                                                           MAIN_COLOR)
+	screen.blit(word_surface, (x, y))
 	pygame.display.update()
 
 
