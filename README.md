@@ -11,4 +11,4 @@ an exam I had, where all the methods need to be implemented in O(1), and the DS 
 initialized in O(n^2)
 
 ## Credits
-The [Tech With Tim] channel(https://www.youtube.com/channel/UC4JX40jDee_tINbkjycV4Sg) gave me the idea to make this project (Though I implemented everything myself)
+The [Tech With Tim](https://www.youtube.com/channel/UC4JX40jDee_tINbkjycV4Sg) channel gave me the idea to make this project (Though I implemented everything myself)
