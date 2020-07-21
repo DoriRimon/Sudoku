@@ -1,12 +1,12 @@
 # Sudoku
 This is a sudoku game you can play, or let the computer solve the board for you at any point.
 
-![sudoku game example](sudoku_example.gif)
+![Game Example](Sudoku_Example.jpg)
 
 ## Backtracking
 Generally the code for solving the sudoku works with backtracking.
 
-![sudoku solution example](sudoku_solve.gif)
+![Backtracking Example](Sudoku_Backtracking_Example.gif)
 
 ## Efficiency
 Simple, though efficient (Writing the algorithms for the methods of the game was a question in 
