@@ -9,7 +9,7 @@ board = [[0 for j in range(AMOUNT)] for i in range(AMOUNT)]
 rows = [{x: False for x in range(1, AMOUNT + 1)} for k in range(AMOUNT)]
 cols = [{x: False for x in range(1, AMOUNT + 1)} for k in range(AMOUNT)]
 sqrs = [{x: False for x in range(1, AMOUNT + 1)} for k in range(AMOUNT)]
-
+4
 rows_win = [AMOUNT for i in range(AMOUNT)]  # for each row how many items are missing
 number_of_full = 0
 
@@ -107,7 +107,7 @@ def solve_backtracking(i, j):
 	while contains(i, j) or contains(i, j, original_board):
 		next_place = next_square(i, j)
 		if type(next_place) is bool:
-			return False
+			return
 		else:
 			i, j = next_place[0], next_place[1]
 	for num in range(1, AMOUNT + 1):
@@ -209,8 +209,7 @@ def draw_board():
 		if i % 3 == 0 and i != 0:
 			width = 3
 		pygame.draw.line(screen, MAIN_COLOR, (0, length * i), (WIDTH, length * i), width)
-		if i != AMOUNT:
-			pygame.draw.line(screen, MAIN_COLOR, (length * i, 0), (length * i, WIDTH), width)
+		pygame.draw.line(screen, MAIN_COLOR, (length * i, 0), (length * i, WIDTH), width)
 	pygame.display.update()
 
 
