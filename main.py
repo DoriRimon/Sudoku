@@ -3,6 +3,7 @@ from PyUI import *
 
 # ----- Game vars -----
 
+original_board = []
 board = [[0 for j in range(AMOUNT)] for i in range(AMOUNT)]
 
 '''
@@ -73,8 +74,8 @@ def find_square(i, j):
 		return 8
 
 
-def contains(i, j):
-	return board[i][j] != 0
+def contains(i, j, this=board):
+	return this[i][j] != 0
 
 
 # assuming i,j isn't empty
@@ -113,61 +114,18 @@ def enter(x, y, number):
 	return flag, number
 
 
-def solve_backtracking():
-	global active_square
-	for num in range(1, AMOUNT + 1):
-		x, y = active_square.x, active_square.y
-		if x + length < WIDTH:
-			x += length
-		elif y + length < WIDTH:
-			x = 0
-			y += length
-		elif win():
-			return True
-		else:
-			return False
-		active_square = pygame.Rect(x, y, length, length)
-		flag, number = enter(x, y, num)
-		if flag:
-			draw_number(int(active_square.x + (length / 2.4)), int(active_square.y + (length / 3.5)), number, True)
-			draw_square(x, y, (0, 255, 0))
-			# print("rows:")
-			# for i in range(AMOUNT):
-			# 	print(rows[i])
-			if solve_backtracking():
-				return True
-			i, j = int(y / length), int(x / length)
-			print("got here")
-			erase(i, j)  # j * length = x, i * length = y
-			if active_square is not None:
-				pygame.draw.rect(screen, BACKGROUND_COLOR, active_square, 3)
-				screen.fill(BACKGROUND_COLOR, active_square)
-			draw_board()
-			draw_square(active_square.x, active_square.y, (255, 0, 0))
-			x, y = active_square.x, active_square.y
-			if x - length >= 0:
-				x -= length
-			elif y - length >= WIDTH:
-				x = WIDTH - length
-				y -= length
-			active_square.x, active_square.y = x, y
-	return False
-
-
 def back_track(i, j):
-	if contains(i, j):
+	if win():
+		return True
+	while contains(i, j) or contains(i, j, original_board):
 		next_place = next_square(i, j)
 		if type(next_place) is bool:
 			return
 		else:
 			i, j = next_place[0], next_place[1]
-		print(i, ", ", j)
 	for num in range(1, AMOUNT + 1):
 		if write(i, j, num):
 			naive_board_print(i, j)
-			print("rows:")
-			for k in range(AMOUNT):
-				print(rows[k])
 			if back_track(i, j):
 				return True
 			erase(i, j)
@@ -195,9 +153,10 @@ def last_square(i, j):
 
 
 def on_click(view):
-	global active_square
+	global active_square, original_board
 	# active_square = pygame.Rect(0, 0, length, length)
 	# solve_backtracking()
+	original_board = board.copy()
 	back_track(0, 0)
 
 
