@@ -1,10 +1,6 @@
 # Sudoku
 This is a sudoku game you can play, or let the computer solve the board for you at any point.
 
-![Game example][vid]
-
-[vid]: https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Logo Title Text 2"
-
 ## Backtracking
 Generally the code for solving the sudoku works with backtracking.
 
