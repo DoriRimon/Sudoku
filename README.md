@@ -1,5 +1,6 @@
 # Sudoku
-This is a sudoku game you can play, or let the computer solve the board for you at any point.
+This is the well known Sudoku game.</br>
+At any point in the game, you can press the 'solve' button, starting a backtracking algorithm that will solve the board
 
 ![Game Example](https://github.com/DoriRimon/Sudoku/blob/master/readme_files/Sudoku_Example.jpg)
 
