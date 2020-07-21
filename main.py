@@ -4,6 +4,7 @@ from PyUI import *
 # ----- Game vars -----
 
 board = [[0 for j in range(AMOUNT)] for i in range(AMOUNT)]
+
 '''
 board = [
 	[7, 8, 0, 4, 0, 0, 1, 2, 0],
@@ -97,10 +98,9 @@ def win():
 	return number_of_full == AMOUNT
 
 
-def enter(event, x, y):
-	number = NUMBERS.index(event.key) + 1
+def enter(x, y, number):
 	# Game:
-	i, j = int((y / WIDTH) * AMOUNT), int((x / WIDTH) * AMOUNT)
+	i, j = int(y / length), int(x / length)
 	num = None
 	if contains(i, j):
 		num = board[i][j]
@@ -113,33 +113,92 @@ def enter(event, x, y):
 	return flag, number
 
 
-def solve_backtracking(view):
-	inserts = []
-	i = 0
-	while i < AMOUNT:
-		j = 0
-		while j < AMOUNT:
-			flag = False
-			for number in range(1, AMOUNT + 1):
-				if write(i, j, number):
-					inserts.append(number)
-					# draw_number(number)
-					flag = True
-					break
-			if not flag:
-				inserts = inserts[:-1]
-				erase(i, j)
-				if j > 0:
-					j -= 1
-				else:
-					i -= 1
-					j = 8
+def solve_backtracking():
+	global active_square
+	for num in range(1, AMOUNT + 1):
+		x, y = active_square.x, active_square.y
+		if x + length < WIDTH:
+			x += length
+		elif y + length < WIDTH:
+			x = 0
+			y += length
+		elif win():
+			return True
+		else:
+			return False
+		active_square = pygame.Rect(x, y, length, length)
+		flag, number = enter(x, y, num)
+		if flag:
+			draw_number(int(active_square.x + (length / 2.4)), int(active_square.y + (length / 3.5)), number, True)
+			draw_square(x, y, (0, 255, 0))
+			# print("rows:")
+			# for i in range(AMOUNT):
+			# 	print(rows[i])
+			if solve_backtracking():
+				return True
+			i, j = int(y / length), int(x / length)
+			print("got here")
+			erase(i, j)  # j * length = x, i * length = y
+			if active_square is not None:
+				pygame.draw.rect(screen, BACKGROUND_COLOR, active_square, 3)
+				screen.fill(BACKGROUND_COLOR, active_square)
+			draw_board()
+			draw_square(active_square.x, active_square.y, (255, 0, 0))
+			x, y = active_square.x, active_square.y
+			if x - length >= 0:
+				x -= length
+			elif y - length >= WIDTH:
+				x = WIDTH - length
+				y -= length
+			active_square.x, active_square.y = x, y
+	return False
 
-			print("rows: ")
-			for i in range(AMOUNT):
-				print(rows[i])
-			j += 1
+
+def back_track(i, j):
+	if contains(i, j):
+		next_place = next_square(i, j)
+		if type(next_place) is bool:
+			return
+		else:
+			i, j = next_place[0], next_place[1]
+		print(i, ", ", j)
+	for num in range(1, AMOUNT + 1):
+		if write(i, j, num):
+			naive_board_print(i, j)
+			print("rows:")
+			for k in range(AMOUNT):
+				print(rows[k])
+			if back_track(i, j):
+				return True
+			erase(i, j)
+	return False
+
+
+def next_square(i, j):
+	j += 1
+	if j > 8:
+		j = 0
 		i += 1
+	if i > 8:
+		return True
+	return i, j
+
+
+def last_square(i, j):
+	j -= 1
+	if j < 0:
+		j = 8
+		i -= 1
+	if i < 0:
+		return False
+	return i, j
+
+
+def on_click(view):
+	global active_square
+	# active_square = pygame.Rect(0, 0, length, length)
+	# solve_backtracking()
+	back_track(0, 0)
 
 
 def main():
@@ -147,7 +206,7 @@ def main():
 	pygame.init()
 	solve = Button(WIDTH - 80, WIDTH + length / 9, 75, 35) \
 		.set_text("solve")\
-		.set_on_click_listener(solve_backtracking) \
+		.set_on_click_listener(on_click) \
 		.set_on_hover_listener(on_hover) \
 		.set_on_unhover_listener(on_unhover) \
 		.set_color(Color(0, 0, 0))
@@ -155,6 +214,42 @@ def main():
 	redraw_screen()
 	draw_board()
 	clock = pygame.time.Clock()
+
+	'''
+	board = [
+		[7, 8, 0, 4, 0, 0, 1, 2, 0],
+		[6, 0, 0, 0, 7, 5, 0, 0, 9],
+		[0, 0, 0, 6, 0, 1, 0, 7, 8],
+		[0, 0, 7, 0, 4, 0, 2, 6, 0],
+		[0, 0, 1, 0, 5, 0, 9, 3, 0],
+		[9, 0, 4, 0, 6, 0, 0, 0, 5],
+		[0, 7, 0, 3, 0, 0, 0, 1, 2],
+		[1, 2, 0, 0, 0, 7, 4, 0, 0],
+		[0, 4, 9, 2, 0, 6, 0, 0, 7]
+	]
+	'''
+	# - || inserting some elements || -
+	'''
+	inserts = [(0, 0, 7), (0, 1, 8), (0, 3, 4), (0, 6, 1), (0, 7, 2),
+	           (1, 0, 6), (1, 4, 7), (1, 5, 5), (1, 8, 9),
+	           (2, 3, 6), (2, 5, 1), (2, 7, 7), (2, 8, 8),
+	           (3, 2, 7), (3, 4, 4), (3, 6, 2), (3, 7, 6),
+	           (4, 2, 1), (4, 4, 5), (4, 6, 9), (4, 7, 3),
+	           (5, 0, 9), (5, 2, 4), (5, 4, 6), (5, 8, 5),
+	           (6, 1, 7), (6, 3, 3), (6, 7, 1), (6, 8, 2),
+	           (7, 0, 1), (7, 1, 2), (7, 5, 7), (7, 6, 4),
+	           (8, 1, 4), (8, 2, 9), (8, 3, 2), (8, 5, 6), (8, 8, 7)]
+	for i, j, number in inserts:
+		active_square = pygame.Rect(j * length, i * length, length, length)
+		x, y = int(active_square.x + (length / 2.4)), int(active_square.y + (length / 3.5))
+
+		# Game:
+		flag, number = enter(x, y, number)
+
+		# GUI:
+		if flag:
+			draw_number(x, y, number)
+	'''
 	run = True
 	while run:
 		events = pygame.event.get()
@@ -173,14 +268,15 @@ def main():
 						pos = (int(int((x / WIDTH) * AMOUNT) * length), int(int((y / WIDTH) * AMOUNT) * length))
 						active_square = pygame.Rect(pos[0], pos[1], length, length)
 						pygame.draw.rect(screen, (255, 0, 0), active_square, 3)
-						pygame.display.update()
+					else:
+						active_square = None
 
 			if event.type == pygame.KEYDOWN:
 				if event.key in NUMBERS and active_square is not None:
 					x, y = int(active_square.x + (length / 2.4)), int(active_square.y + (length / 3.5))
 					if x < WIDTH and y < WIDTH:
 						# Game:
-						flag, number = enter(event, x, y)
+						flag, number = enter(x, y, NUMBERS.index(event.key) + 1)
 
 						# GUI:
 						if flag:
@@ -212,16 +308,40 @@ def draw_board():
 	pygame.display.update()
 
 
-def draw_number(x, y, number):
+def draw_square(x, y, color):
+	pygame.draw.rect(screen, color, (x, y, length, length), 3)
+	pygame.display.update()
+
+
+def draw_number(x, y, number, no_board_draw=False, override=False):
 	if active_square is not None:
 		pygame.draw.rect(screen, BACKGROUND_COLOR, active_square, 3)
 		screen.fill(BACKGROUND_COLOR, active_square)
-	draw_board()
-	pygame.draw.rect(screen, (255, 0, 0), active_square, 3)
-	word_surface = pygame.font.SysFont("microsoftjhengheimicrosoftjhengheiuilight", 20).render(str(number), 0,
-	                                                                                           MAIN_COLOR)
-	screen.blit(word_surface, (x, y))
-	pygame.display.update()
+	if not no_board_draw:
+		draw_board()
+	if number != 0:
+		if active_square is not None and not override:
+			pygame.draw.rect(screen, (255, 0, 0), active_square, 3)
+		word_surface = pygame.font.SysFont("microsoftjhengheimicrosoftjhengheiuilight", 20).render(str(number), 0,
+		                                                                                           MAIN_COLOR)
+		screen.blit(word_surface, (x, y))
+	pygame.display.update(active_square)
+
+
+def naive_board_print(i, j):
+	global active_square
+	while i < AMOUNT and j < AMOUNT:
+		x, y = j * length, i * length
+		# pos = (int(int((x / WIDTH) * AMOUNT) * length), int(int((y / WIDTH) * AMOUNT) * length))
+		active_square = pygame.Rect(x, y, length, length)
+		x, y = int(x + (length / 2.4)), int(y + (length / 3.5))
+		if contains(i, j):
+			draw_number(x, y, 0, False, True)
+		draw_number(x, y, board[i][j], False, True)
+		next_place = next_square(i, j)
+		if type(next_place) is bool:
+			return
+		i, j = next_place[0], next_place[1]
 
 
 def on_hover(view):
