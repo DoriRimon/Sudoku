@@ -6,19 +6,6 @@ from PyUI import *
 original_board = []
 board = [[0 for j in range(AMOUNT)] for i in range(AMOUNT)]
 
-'''
-board = [
-	[7, 8, 0, 4, 0, 0, 1, 2, 0],
-	[6, 0, 0, 0, 7, 5, 0, 0, 9],
-	[0, 0, 0, 6, 0, 1, 0, 7, 8],
-	[0, 0, 7, 0, 4, 0, 2, 6, 0],
-	[0, 0, 1, 0, 5, 0, 9, 3, 0],
-	[9, 0, 4, 0, 6, 0, 0, 0, 5],
-	[0, 7, 0, 3, 0, 0, 0, 1, 2],
-	[1, 2, 0, 0, 0, 7, 4, 0, 0],
-	[0, 4, 9, 2, 0, 6, 0, 0, 7]
-]
-'''
 rows = [{x: False for x in range(1, AMOUNT + 1)} for k in range(AMOUNT)]
 cols = [{x: False for x in range(1, AMOUNT + 1)} for k in range(AMOUNT)]
 sqrs = [{x: False for x in range(1, AMOUNT + 1)} for k in range(AMOUNT)]
@@ -120,12 +107,12 @@ def solve_backtracking(i, j):
 	while contains(i, j) or contains(i, j, original_board):
 		next_place = next_square(i, j)
 		if type(next_place) is bool:
-			return
+			return False
 		else:
 			i, j = next_place[0], next_place[1]
 	for num in range(1, AMOUNT + 1):
 		if write(i, j, num):
-			naive_board_print(i, j)
+			override_square(i, j)
 			if solve_backtracking(i, j):
 				return True
 			erase(i, j)
@@ -152,14 +139,6 @@ def last_square(i, j):
 	return i, j
 
 
-def on_click(view):
-	global active_square, original_board
-	# active_square = pygame.Rect(0, 0, length, length)
-	# solve_backtracking()
-	original_board = board.copy()
-	solve_backtracking(0, 0)
-
-
 def main():
 	global active_square
 	pygame.init()
@@ -174,41 +153,6 @@ def main():
 	draw_board()
 	clock = pygame.time.Clock()
 
-	'''
-	board = [
-		[7, 8, 0, 4, 0, 0, 1, 2, 0],
-		[6, 0, 0, 0, 7, 5, 0, 0, 9],
-		[0, 0, 0, 6, 0, 1, 0, 7, 8],
-		[0, 0, 7, 0, 4, 0, 2, 6, 0],
-		[0, 0, 1, 0, 5, 0, 9, 3, 0],
-		[9, 0, 4, 0, 6, 0, 0, 0, 5],
-		[0, 7, 0, 3, 0, 0, 0, 1, 2],
-		[1, 2, 0, 0, 0, 7, 4, 0, 0],
-		[0, 4, 9, 2, 0, 6, 0, 0, 7]
-	]
-	'''
-	# - || inserting some elements || -
-	'''
-	inserts = [(0, 0, 7), (0, 1, 8), (0, 3, 4), (0, 6, 1), (0, 7, 2),
-	           (1, 0, 6), (1, 4, 7), (1, 5, 5), (1, 8, 9),
-	           (2, 3, 6), (2, 5, 1), (2, 7, 7), (2, 8, 8),
-	           (3, 2, 7), (3, 4, 4), (3, 6, 2), (3, 7, 6),
-	           (4, 2, 1), (4, 4, 5), (4, 6, 9), (4, 7, 3),
-	           (5, 0, 9), (5, 2, 4), (5, 4, 6), (5, 8, 5),
-	           (6, 1, 7), (6, 3, 3), (6, 7, 1), (6, 8, 2),
-	           (7, 0, 1), (7, 1, 2), (7, 5, 7), (7, 6, 4),
-	           (8, 1, 4), (8, 2, 9), (8, 3, 2), (8, 5, 6), (8, 8, 7)]
-	for i, j, number in inserts:
-		active_square = pygame.Rect(j * length, i * length, length, length)
-		x, y = int(active_square.x + (length / 2.4)), int(active_square.y + (length / 3.5))
-
-		# Game:
-		flag, number = enter(x, y, number)
-
-		# GUI:
-		if flag:
-			draw_number(x, y, number)
-	'''
 	run = True
 	while run:
 		events = pygame.event.get()
@@ -254,7 +198,6 @@ def main():
 
 # ----- GUI methods -----
 
-
 def redraw_screen():
 	screen.fill(BACKGROUND_COLOR)
 	pygame.display.update()
@@ -292,19 +235,20 @@ def draw_number(x, y, number, no_board_draw=False, override=False):
 	pygame.display.update(active_square)
 
 
-def naive_board_print(i, j):
+def override_square(i, j):
 	global active_square
-	while i < AMOUNT and j < AMOUNT:
-		x, y = j * length, i * length
-		active_square = pygame.Rect(x, y, length, length)
-		x, y = int(x + (length / 2.4)), int(y + (length / 3.5))
-		if contains(i, j):
-			draw_number(x, y, 0, False, True)
-		draw_number(x, y, board[i][j], False, True)
-		next_place = next_square(i, j)
-		if type(next_place) is bool:
-			return
-		i, j = next_place[0], next_place[1]
+	x, y = j * length, i * length
+	active_square = pygame.Rect(x, y, length, length)
+	x, y = int(x + (length / 2.4)), int(y + (length / 3.5))
+	if contains(i, j):
+		draw_number(x, y, 0, False, True)
+	draw_number(x, y, board[i][j], False, True)
+
+
+def on_click(view):
+	global active_square, original_board
+	original_board = board.copy()
+	solve_backtracking(0, 0)
 
 
 def on_hover(view):
