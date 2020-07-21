@@ -9,7 +9,7 @@ Simple, though efficient (Writing the algorithms for the methods of the game was
 an exam I had, where all the game methods need to be implemented in O(1), and the DS needs to be
 initialized in O(n^2)).
 
-Note: obviously the solving method isn't efficient, I just wanted to experiment with backtracking..
+Note: obviously the solving method isn't efficient, I just wanted to experiment with backtracking.. </br>
 I might add a more elegant solution in the future.
 
 ## Credits
