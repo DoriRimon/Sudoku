@@ -114,7 +114,7 @@ def enter(x, y, number):
 	return flag, number
 
 
-def back_track(i, j):
+def solve_backtracking(i, j):
 	if win():
 		return True
 	while contains(i, j) or contains(i, j, original_board):
@@ -126,7 +126,7 @@ def back_track(i, j):
 	for num in range(1, AMOUNT + 1):
 		if write(i, j, num):
 			naive_board_print(i, j)
-			if back_track(i, j):
+			if solve_backtracking(i, j):
 				return True
 			erase(i, j)
 	return False
@@ -157,7 +157,7 @@ def on_click(view):
 	# active_square = pygame.Rect(0, 0, length, length)
 	# solve_backtracking()
 	original_board = board.copy()
-	back_track(0, 0)
+	solve_backtracking(0, 0)
 
 
 def main():
@@ -231,15 +231,19 @@ def main():
 						active_square = None
 
 			if event.type == pygame.KEYDOWN:
-				if event.key in NUMBERS and active_square is not None:
+				if event.key in NUMBERS + [pygame.K_BACKSPACE] and active_square is not None:
 					x, y = int(active_square.x + (length / 2.4)), int(active_square.y + (length / 3.5))
 					if x < WIDTH and y < WIDTH:
-						# Game:
-						flag, number = enter(x, y, NUMBERS.index(event.key) + 1)
+						if event.key != pygame.K_BACKSPACE:
+							# Game:
+							flag, number = enter(x, y, NUMBERS.index(event.key) + 1)
 
-						# GUI:
-						if flag:
-							draw_number(x, y, number)
+							# GUI:
+							if flag:
+								draw_number(x, y, number)
+						else:
+							draw_number(x, y, 0)
+							erase(int(y / length), int(x / length))
 
 		ViewHandler.handle_view_events(events)
 
@@ -278,11 +282,12 @@ def draw_number(x, y, number, no_board_draw=False, override=False):
 		screen.fill(BACKGROUND_COLOR, active_square)
 	if not no_board_draw:
 		draw_board()
+
+	if active_square is not None and not override:
+		pygame.draw.rect(screen, (255, 0, 0), active_square, 3)
+
 	if number != 0:
-		if active_square is not None and not override:
-			pygame.draw.rect(screen, (255, 0, 0), active_square, 3)
-		word_surface = pygame.font.SysFont("microsoftjhengheimicrosoftjhengheiuilight", 20).render(str(number), 0,
-		                                                                                           MAIN_COLOR)
+		word_surface = pygame.font.SysFont("microsoftjhengheimicrosoftjhengheiuilight", 20).render(str(number), 0, MAIN_COLOR)
 		screen.blit(word_surface, (x, y))
 	pygame.display.update(active_square)
 
@@ -291,7 +296,6 @@ def naive_board_print(i, j):
 	global active_square
 	while i < AMOUNT and j < AMOUNT:
 		x, y = j * length, i * length
-		# pos = (int(int((x / WIDTH) * AMOUNT) * length), int(int((y / WIDTH) * AMOUNT) * length))
 		active_square = pygame.Rect(x, y, length, length)
 		x, y = int(x + (length / 2.4)), int(y + (length / 3.5))
 		if contains(i, j):
