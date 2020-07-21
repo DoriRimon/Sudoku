@@ -1,4 +1,5 @@
 from globe import *
+from PyUI import *
 
 # ----- Game vars -----
 
@@ -30,6 +31,7 @@ pygame.display.set_caption("Sudoku")
 length = int(WIDTH / AMOUNT)
 
 active_square = None
+
 
 # ----- Game methods -----
 
@@ -111,14 +113,52 @@ def enter(event, x, y):
 	return flag, number
 
 
+def solve_backtracking(view):
+	inserts = []
+	i = 0
+	while i < AMOUNT:
+		j = 0
+		while j < AMOUNT:
+			flag = False
+			for number in range(1, AMOUNT + 1):
+				if write(i, j, number):
+					inserts.append(number)
+					# draw_number(number)
+					flag = True
+					break
+			if not flag:
+				inserts = inserts[:-1]
+				erase(i, j)
+				if j > 0:
+					j -= 1
+				else:
+					i -= 1
+					j = 8
+
+			print("rows: ")
+			for i in range(AMOUNT):
+				print(rows[i])
+			j += 1
+		i += 1
+
+
 def main():
 	global active_square
 	pygame.init()
+	solve = Button(WIDTH - 80, WIDTH + length / 9, 75, 35) \
+		.set_text("solve")\
+		.set_on_click_listener(solve_backtracking) \
+		.set_on_hover_listener(on_hover) \
+		.set_on_unhover_listener(on_unhover) \
+		.set_color(Color(0, 0, 0))
+
 	redraw_screen()
 	draw_board()
+	clock = pygame.time.Clock()
 	run = True
 	while run:
-		for event in pygame.event.get():
+		events = pygame.event.get()
+		for event in events:
 			if event.type == pygame.QUIT:
 				run = False
 				pygame.quit()
@@ -145,6 +185,12 @@ def main():
 						# GUI:
 						if flag:
 							draw_number(x, y, number)
+
+		ViewHandler.handle_view_events(events)
+
+		ViewHandler.render_views(screen)
+		pygame.display.update()
+		clock.tick(60)
 
 
 # ----- GUI methods -----
@@ -178,6 +224,13 @@ def draw_number(x, y, number):
 	pygame.display.update()
 
 
+def on_hover(view):
+	view.text.set_color(Color(255, 0, 0))
+
+
+def on_unhover(view):
+	view.text.set_color(Color(0, 0, 0))
+
+
 if __name__ == "__main__":
 	main()
-
