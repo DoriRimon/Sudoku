@@ -1,5 +1,6 @@
 from globe import *
 from PyUI import *
+import copy
 
 # ----- Game vars -----
 
@@ -9,7 +10,7 @@ board = [[0 for j in range(AMOUNT)] for i in range(AMOUNT)]
 rows = [{x: False for x in range(1, AMOUNT + 1)} for k in range(AMOUNT)]
 cols = [{x: False for x in range(1, AMOUNT + 1)} for k in range(AMOUNT)]
 sqrs = [{x: False for x in range(1, AMOUNT + 1)} for k in range(AMOUNT)]
-4
+
 rows_win = [AMOUNT for i in range(AMOUNT)]  # for each row how many items are missing
 number_of_full = 0
 
@@ -86,6 +87,21 @@ def win():
 	return number_of_full == AMOUNT
 
 
+def reset_game():
+	global original_board, board, rows, cols, sqrs, rows_win, number_of_full, active_square
+	original_board = []
+	board = [[0 for j in range(AMOUNT)] for i in range(AMOUNT)]
+
+	rows = [{x: False for x in range(1, AMOUNT + 1)} for k in range(AMOUNT)]
+	cols = [{x: False for x in range(1, AMOUNT + 1)} for k in range(AMOUNT)]
+	sqrs = [{x: False for x in range(1, AMOUNT + 1)} for k in range(AMOUNT)]
+
+	rows_win = [AMOUNT for i in range(AMOUNT)]  # for each row how many items are missing
+	number_of_full = 0
+
+	active_square = None
+
+
 def enter(x, y, number):
 	# Game:
 	i, j = int(y / length), int(x / length)
@@ -101,10 +117,13 @@ def enter(x, y, number):
 	return flag, number
 
 
-def solve_backtracking(i, j):
+def solve_backtracking(i, j, clock):
+	if contains(i, j, original_board):
+		print(i, ", ", j)
+		draw_square(j * length, i * length, (0, 255, 0))
 	if win():
 		return True
-	while contains(i, j) or contains(i, j, original_board):
+	while contains(i, j, board) or contains(i, j, original_board):
 		next_place = next_square(i, j)
 		if type(next_place) is bool:
 			return
@@ -113,9 +132,12 @@ def solve_backtracking(i, j):
 	for num in range(1, AMOUNT + 1):
 		if write(i, j, num):
 			override_square(i, j)
-			if solve_backtracking(i, j):
+			draw_square(j * length, i * length, (0, 255, 0))
+			# clock.tick(60)
+			if solve_backtracking(i, j, clock):
 				return True
 			erase(i, j)
+			draw_square(j * length, i * length, (255, 0, 0))
 	return False
 
 
@@ -142,9 +164,16 @@ def last_square(i, j):
 def main():
 	global active_square
 	pygame.init()
-	solve = Button(WIDTH - 80, WIDTH + length / 9, 75, 35) \
-		.set_text("solve")\
-		.set_on_click_listener(on_click) \
+	solve = Button(WIDTH / 2 - 80, WIDTH + length / 9, 75, 35) \
+		.set_text("solve") \
+		.set_on_click_listener(on_solve_click) \
+		.set_on_hover_listener(on_hover) \
+		.set_on_unhover_listener(on_unhover) \
+		.set_color(Color(0, 0, 0))
+
+	restart = Button(WIDTH / 2 + 5, WIDTH + length / 9, 75, 35) \
+		.set_text("reset") \
+		.set_on_click_listener(on_restart_click) \
 		.set_on_hover_listener(on_hover) \
 		.set_on_unhover_listener(on_unhover) \
 		.set_color(Color(0, 0, 0))
@@ -161,33 +190,35 @@ def main():
 				run = False
 				pygame.quit()
 
-			if event.type == pygame.MOUSEBUTTONDOWN:
-				if event.button == 1:
-					if active_square is not None:
-						pygame.draw.rect(screen, BACKGROUND_COLOR, active_square, 3)
-					draw_board()
-					x, y = event.pos
-					if x < WIDTH and y < WIDTH:
-						pos = (int(int((x / WIDTH) * AMOUNT) * length), int(int((y / WIDTH) * AMOUNT) * length))
-						active_square = pygame.Rect(pos[0], pos[1], length, length)
-						pygame.draw.rect(screen, (255, 0, 0), active_square, 3)
-					else:
-						active_square = None
+			if not win():
 
-			if event.type == pygame.KEYDOWN:
-				if event.key in NUMBERS + [pygame.K_BACKSPACE] and active_square is not None:
-					x, y = int(active_square.x + (length / 2.4)), int(active_square.y + (length / 3.5))
-					if x < WIDTH and y < WIDTH:
-						if event.key != pygame.K_BACKSPACE:
-							# Game:
-							flag, number = enter(x, y, NUMBERS.index(event.key) + 1)
-
-							# GUI:
-							if flag:
-								draw_number(x, y, number)
+				if event.type == pygame.MOUSEBUTTONDOWN:
+					if event.button == 1:
+						if active_square is not None:
+							pygame.draw.rect(screen, BACKGROUND_COLOR, active_square, 3)
+						draw_board()
+						x, y = event.pos
+						if x < WIDTH and y < WIDTH:
+							pos = (int(int((x / WIDTH) * AMOUNT) * length), int(int((y / WIDTH) * AMOUNT) * length))
+							active_square = pygame.Rect(pos[0], pos[1], length, length)
+							pygame.draw.rect(screen, (255, 0, 0), active_square, 3)
 						else:
-							draw_number(x, y, 0)
-							erase(int(y / length), int(x / length))
+							active_square = None
+
+				if event.type == pygame.KEYDOWN:
+					if event.key in NUMBERS + [pygame.K_BACKSPACE] and active_square is not None:
+						x, y = int(active_square.x + (length / 2.4)), int(active_square.y + (length / 3.5))
+						if x < WIDTH and y < WIDTH:
+							if event.key != pygame.K_BACKSPACE:
+								# Game:
+								flag, number = enter(x, y, NUMBERS.index(event.key) + 1)
+
+								# GUI:
+								if flag:
+									draw_number(x, y, number)
+							else:
+								draw_number(x, y, 0)
+								erase(int(y / length), int(x / length))
 
 		ViewHandler.handle_view_events(events)
 
@@ -240,14 +271,21 @@ def override_square(i, j):
 	active_square = pygame.Rect(x, y, length, length)
 	x, y = int(x + (length / 2.4)), int(y + (length / 3.5))
 	if contains(i, j):
-		draw_number(x, y, 0, False, True)
-	draw_number(x, y, board[i][j], False, True)
+		draw_number(x, y, 0, True, True)
+	draw_number(x, y, board[i][j], True, True)
 
 
-def on_click(view):
+def on_solve_click(view):
 	global active_square, original_board
-	original_board = board.copy()
-	solve_backtracking(0, 0)
+	clock = pygame.time.Clock()
+	original_board = copy.deepcopy(board)
+	solve_backtracking(0, 0, clock)
+
+
+def on_restart_click(view):
+	redraw_screen()
+	draw_board()
+	reset_game()
 
 
 def on_hover(view):
