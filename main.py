@@ -2,6 +2,8 @@ from globe import *
 from PyUI import *
 import copy
 
+# TODO - reset doesn't reset well (not all values possible allow you to write)
+
 # ----- Game vars -----
 
 original_board = []
@@ -106,7 +108,7 @@ def enter(x, y, number):
 	# Game:
 	i, j = int(y / length), int(x / length)
 	num = None
-	if contains(i, j):
+	if contains(i, j, board):
 		num = board[i][j]
 		erase(i, j)
 	flag = write(i, j, number)
@@ -294,6 +296,7 @@ def on_restart_click(view):
 	redraw_screen()
 	draw_board()
 	reset_game()
+	print(board)
 
 
 def on_hover(view):
