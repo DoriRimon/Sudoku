@@ -64,8 +64,8 @@ def find_square(i, j):
 		return 8
 
 
-def contains(i, j, this=board):
-	return this[i][j] != 0
+def contains(i, j, grid):
+	return grid[i][j] != 0
 
 
 # assuming i,j isn't empty
@@ -280,7 +280,7 @@ def override_square(i, j):
 	x, y = j * length, i * length
 	active_square = pygame.Rect(x, y, length, length)
 	x, y = int(x + (length / 2.4)), int(y + (length / 3.5))
-	if contains(i, j):
+	if contains(i, j, board):
 		draw_number(x, y, 0, True, True)
 	draw_number(x, y, board[i][j], True, True)
 
