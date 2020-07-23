@@ -2,12 +2,12 @@
 This is the well known Sudoku game.</br>
 At any point in the game, you can press the 'solve' button, starting a backtracking algorithm that will solve the board
 
-![Game Example](https://github.com/DoriRimon/Sudoku/blob/master/readme_files/Sudoku_Example.jpg)
+<img src="https://github.com/DoriRimon/Sudoku/blob/master/readme_files/Sudoku_Example.jpg" width="300" height="325">
 
 ## Backtracking
 Generally the code for solving the sudoku works with backtracking.
 
-![Backtracking Example](https://github.com/DoriRimon/Sudoku/blob/master/readme_files/Sudoku_Backtracking_Example.gif)
+<img src="https://github.com/DoriRimon/Sudoku/blob/master/readme_files/Sudoku_Backtracking_Example.gif" width="300" height="325">
 
 ## Efficiency
 Simple, though efficient (Writing the algorithms for the methods of the game was a question in 
