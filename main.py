@@ -122,6 +122,7 @@ def solve_backtracking(i, j, clock):
 		print(i, ", ", j)
 		draw_square(j * length, i * length, (0, 255, 0))
 	if win():
+		draw_done_board()
 		return True
 	while contains(i, j, board) or contains(i, j, original_board):
 		next_place = next_square(i, j)
@@ -241,6 +242,13 @@ def draw_board():
 			width = 3
 		pygame.draw.line(screen, MAIN_COLOR, (0, length * i), (WIDTH, length * i), width)
 		pygame.draw.line(screen, MAIN_COLOR, (length * i, 0), (length * i, WIDTH), width)
+	pygame.display.update()
+
+
+def draw_done_board():
+	for i in range(AMOUNT + 1):
+		pygame.draw.line(screen, (0, 255, 0), (0, length * i), (WIDTH, length * i), 3)
+		pygame.draw.line(screen, (0, 255, 0), (length * i, 0), (length * i, WIDTH), 3)
 	pygame.display.update()
 
 
