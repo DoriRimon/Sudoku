@@ -1,6 +1,7 @@
 from globe import *
 from PyUI import *
 import copy
+import pygame
 
 # TODO - reset doesn't reset well (not all values possible allow you to write)
 
@@ -121,7 +122,6 @@ def enter(x, y, number):
 
 def solve_backtracking(i, j, clock):
 	if contains(i, j, original_board):
-		print(i, ", ", j)
 		draw_square(j * length, i * length, (0, 255, 0))
 	if win():
 		draw_done_board()
@@ -296,7 +296,6 @@ def on_restart_click(view):
 	redraw_screen()
 	draw_board()
 	reset_game()
-	print(board)
 
 
 def on_hover(view):
