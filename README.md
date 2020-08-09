@@ -7,7 +7,7 @@ At any point in the game, you can press the 'solve' button, starting a backtrack
 ## Backtracking
 Generally the code for solving the sudoku works with backtracking.
 
-<img src="https://github.com/DoriRimon/Sudoku/blob/master/readme_files/Sudoku_Backtracking_Example.gif" width="300" height="325">
+<img src="https://github.com/DoriRimon/Sudoku/blob/master/readme_files/Sudoku_Backtracking.gif" width="300" height="325">
 
 ## Efficiency
 Simple, though efficient (Writing the algorithms for the methods of the game was a question in 
