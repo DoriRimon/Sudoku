@@ -2,8 +2,6 @@
 This is the well known Sudoku game.</br>
 At any point in the game, you can press the 'solve' button, starting a backtracking algorithm that will solve the board
 
-<img src="https://github.com/DoriRimon/Sudoku/blob/master/readme_files/Sudoku_Example.jpg" width="300" height="325">
-
 ## Backtracking
 Generally the code for solving the sudoku works with backtracking.
 
