@@ -1,6 +1,6 @@
 # Sudoku
 This is the well known Sudoku game.</br>
-At any point in the game, you can press the 'solve' button, starting a backtracking algorithm that will solve the board
+At any point in the game, you can press the 'solve' button, starting a backtracking algorithm that will solve the board.
 
 ## Backtracking
 Generally the code for solving the sudoku works with backtracking.
